@@ -80,7 +80,6 @@ const app = new Elysia()
   })
 
   // --- AUTH ROUTES ---
-
   // Redirect mahasiswa ke halaman login Google
   .get("/auth/login", ({ redirect }) => {
     const oauth2Client = createOAuthClient();
