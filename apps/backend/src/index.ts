@@ -32,6 +32,8 @@ const app = new Elysia()
   .use(
     cors({
       origin: [process.env.FRONTEND_URL ?? "", process.env.TEST_URL ?? ""],
+      credentials: true,
+      allowedHeaders: ["Content-Type", "Authorization"],
     }),
   )
   .use(swagger())
@@ -109,8 +111,14 @@ const app = new Elysia()
       if (!session) return;
 
       // Set cookie session
-      session.value = sessionId;
-      session.maxAge = 60 * 60 * 24; // 1 hari
+      session.set({
+        value: sessionId,
+        httpOnly: true, // Mencegah XSS (keamanan)
+        secure: true, // WAJIB: Vercel menggunakan HTTPS
+        sameSite: "none", // WAJIB: Agar cookie bisa dikirim dari domain backend ke frontend Vercel
+        path: "/", // Tersedia di semua route
+        maxAge: 60 * 60 * 24, // 1 hari
+      });
 
       // Redirect ke frontend
       return redirect(`${process.env.FRONTEND_URL}/classroom`);
